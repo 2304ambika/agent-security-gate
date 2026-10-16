@@ -3,4 +3,6 @@
 .env.local
 *.pem
 secrets.local.*
+__pycache__/
+*.py[cod]
 
