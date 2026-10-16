@@ -11,16 +11,22 @@ from urllib.parse import urlparse
 from .policy import ContentPolicy, NetworkPolicy, SecurityPolicy, TrustLevel
 
 _INJECTION_PATTERNS: tuple[re.Pattern[str], ...] = (
-    re.compile(r"(?i)\bignore\s+(all\s+)?(previous|prior|above)\s+instructions?\b"),
+    re.compile(r"(?i)\bignore\s+(all\s+)?(previous|prior|above)\s+(instructions?|rules?)\b"),
+    re.compile(r"(?i)\bignore\s+all\s+prior\s+(rules?|instructions?)\b"),
     re.compile(r"(?i)\bdisregard\s+(your|the)\s+(system|safety)\s+(prompt|rules?)\b"),
     re.compile(r"(?i)\byou\s+are\s+now\s+(in\s+)?(developer|god|jailbreak)\s+mode\b"),
     re.compile(
-        r"(?i)\b(exfiltrat|send|leak|upload)\b.{0,40}\b(api[_ ]?key|password|secret|\.env)\b"
+        r"(?i)\b(exfiltrat|send|leak|upload|export)\b.{0,60}\b(api[_ ]?key|password|secret|\.env|system prompt)\b"
     ),
     re.compile(r"(?i)\bread\s+.{0,20}\.env\b"),
     re.compile(r"(?i)\bping\b.{0,80}\b(attacker|exfil|evil)\b"),
     re.compile(r"(?i)</?\s*system\s*>"),
     re.compile(r"(?i)\[INST\]|<<\s*SYS\s*>>"),
+    re.compile(r"(?i)\[SYSTEM\s+OVERRIDE\]|disable\s+all\s+safety\s+checks"),
+    re.compile(r"(?i)\b(call|invoke|run)\s+the\s+(deploy|shell|admin)\s+tool\b"),
+    re.compile(r"(?i)\bprint\s+(all\s+)?environment\s+variables\b"),
+    re.compile(r"(?i)\bskip\s+(the\s+)?approval\b"),
+    re.compile(r"(?i)\bNOTE\s+TO\s+AGENT\b"),
     re.compile(r"(?i)\b(always|from now on)\s+(send|forward|exfiltrate)\b"),
     re.compile(r"(?i)\bstore\s+this\s+in\s+(memory|memories)\b"),
 )

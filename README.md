@@ -177,9 +177,29 @@ The prototype supports the paper’s thesis for this benchmark: **security must 
 
 ```bash
 python3 demo.py
-python3 benchmarks/run_bench.py   # → results/metrics.json, results/catalog.json
+python3 benchmarks/run_bench.py              # → results/metrics.json, results/catalog.json
+python3 benchmarks/run_external_bench.py     # Hendar + hard external suites
 python3 tests/test_gate.py
 ```
+
+Refresh external dumps (optional):
+
+```bash
+bash benchmarks/download_external.sh
+python3 benchmarks/prepare_hard_sets.py
+```
+
+### External / hard suites
+
+| Suite | Source | What we keep |
+| --- | --- | --- |
+| `internal` | `benchmarks/scenarios.py` | baseline synthetic |
+| `hendar` | [Hendar](https://huggingface.co/datasets/h0000w/hendar-agentic-ai-dataset) | PI / unsafe tools / policy / multi-agent |
+| `lakera_l2` | [Lakera B3](https://huggingface.co/datasets/Lakera/b3-agent-security-benchmark-weak) | defense level 2 only |
+| `injecagent_hard` | [InjecAgent](https://github.com/uiuc-kang-lab/InjecAgent) | hard IPI + attacker-tool attempts |
+| `a3s_hard` | [A3S-Bench](https://huggingface.co/datasets/inclusionAI/A3S-Bench) | high-risk injection cases |
+| `agentharm_toolish` | [AgentHarm](https://huggingface.co/datasets/ai-safety-institute/AgentHarm) | toolish harmful plans |
+| `coding_agent` | [coding-agent-security-benchmark](https://huggingface.co/datasets/rogue-security/coding-agent-security-benchmark) | labeled session messages |
 
 ### Layout
 
@@ -189,4 +209,6 @@ python3 tests/test_gate.py
 | `benchmarks/catalog.py` | 45-case historical/schema catalog |
 | `benchmarks/scenarios.py` | Executable synthetic scenarios by difficulty |
 | `benchmarks/run_bench.py` | Train→re-eval harness + architecture metrics |
-| `results/` | Latest metrics and catalog export |
+| `benchmarks/external_adapters.py` | HF/GitHub → Scenario |
+| `benchmarks/run_external_bench.py` | Multi-suite external comparison |
+| `results/` | Latest metrics, catalog, and external metrics |
