@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Difficulty-tiered harness: score → learn from FNs → re-score → report."""
+"""Difficulty-tiered harness over the paper/OWASP/emerging attack catalog."""
 
 from __future__ import annotations
 
@@ -14,23 +14,34 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from agent_security_gate.policy import SecurityPolicy, default_policy  # noqa: E402
 from agent_security_gate.tcb import SecurityTCB  # noqa: E402
+from catalog import CASES, catalog_json  # noqa: E402
 from scenarios import SCENARIOS, Difficulty, Scenario, by_difficulty  # noqa: E402
 
 TIERS: tuple[Difficulty, ...] = ("easy", "hard", "held_out")
-# Train (absorb FNs) only on these; held_out measures generalization
 TRAIN_TIERS: frozenset[Difficulty] = frozenset({"easy", "hard"})
+
+_ALL_TOOLS = (
+    "http_fetch",
+    "shell_exec",
+    "read_file",
+    "write_file",
+    "delete_file",
+    "dns_lookup",
+    "ping",
+    "send_email",
+    "update_memory",
+    "update_config",
+    "start_server",
+    "browser_navigate",
+    "browser_submit",
+    "clipboard_write",
+    "mcp_invoke",
+    "agent_message",
+)
 
 
 def _stub_tools(tcb: SecurityTCB) -> None:
-    for name in (
-        "http_fetch",
-        "shell_exec",
-        "read_file",
-        "write_file",
-        "dns_lookup",
-        "ping",
-        "send_email",
-    ):
+    for name in _ALL_TOOLS:
         tcb.register_tool(name, lambda args, _n=name: {"tool": _n, "echo": args})
 
 
@@ -45,9 +56,20 @@ def _rates(tp: int, fp: int, tn: int, fn: int) -> dict[str, float]:
         2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
     )
     accuracy = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) else 0.0
+    # Architecture-oriented metrics (brief §6)
+    asr = fn / attack if attack else 0.0  # attack success = we failed to block
+    containment = tpr
+    unauthorized_action_rate = asr
+    false_block_rate = fpr
+    utility_retention = tn / benign if benign else 0.0
     return {
         "attack_block_rate_tpr": round(tpr, 4),
+        "attack_success_rate_asr": round(asr, 4),
+        "containment_rate": round(containment, 4),
+        "unauthorized_action_rate": round(unauthorized_action_rate, 4),
         "false_positive_rate": round(fpr, 4),
+        "false_block_rate": round(false_block_rate, 4),
+        "utility_retention": round(utility_retention, 4),
         "false_negative_rate": round(fn / attack if attack else 0.0, 4),
         "precision": round(precision, 4),
         "recall": round(recall, 4),
@@ -70,12 +92,15 @@ def score(
     step_rows: list[dict] = []
     fn_events: list[dict] = []
     tools_u = tools_g = 0
+    case_fail: set[str] = set()
+    case_ids: set[str] = set()
 
     for sc in scenarios:
         tcb.begin_task(sc.principal, sc.task, role=sc.role)
         tools_u += tcb.unrestricted_tool_count()
         tools_g += tcb.privilege_count()
         fam = by_family.setdefault(sc.family, {"tp": 0, "fp": 0, "tn": 0, "fn": 0})
+        case_ids.add(sc.case_id)
 
         for step in sc.steps:
             res = tcb.invoke(
@@ -92,9 +117,11 @@ def score(
             elif step.expect_block and not blocked:
                 fn += 1
                 fam["fn"] += 1
+                case_fail.add(sc.case_id)
                 fn_events.append(
                     {
                         "scenario": sc.id,
+                        "case_id": sc.case_id,
                         "step": step.label,
                         "tool": step.tool,
                         "args": step.args,
@@ -112,8 +139,10 @@ def score(
                 {
                     "phase": phase,
                     "scenario": sc.id,
+                    "case_id": sc.case_id,
                     "family": sc.family,
                     "difficulty": sc.difficulty,
+                    "control": sc.control,
                     "step": step.label,
                     "blocked": blocked,
                     "expect_block": step.expect_block,
@@ -129,17 +158,25 @@ def score(
     rates["complete_mediation_rate"] = round(
         mediation / (mediation + bypass) if (mediation + bypass) else 1.0, 4
     )
+    rates["policy_enforcement_coverage"] = rates["complete_mediation_rate"]
     rates["privilege_reduction"] = round(
         1.0 - (tools_g / tools_u) if tools_u else 0.0, 4
+    )
+    attack_cases = {s.case_id for s in scenarios if s.is_attack}
+    rates["case_containment_rate"] = round(
+        1.0 - (len(case_fail & attack_cases) / len(attack_cases)) if attack_cases else 1.0,
+        4,
     )
     return {
         "counts": {
             "scenarios": len(scenarios),
             "steps": len(step_rows),
+            "cases": len(case_ids),
             "tp": tp,
             "fp": fp,
             "tn": tn,
             "fn": fn,
+            "cases_with_fn": sorted(case_fail),
         },
         "rates": rates,
         "latency_ms": {
@@ -154,19 +191,17 @@ def score(
         "by_family": by_family,
         "fn_events": fn_events,
         "steps": step_rows,
-        "_tcb": tcb,  # internal: used for absorb on same policy object
     }
 
 
 def train_on_fns(tcb: SecurityTCB, fn_events: list[dict]) -> dict[str, int]:
-    """Trusted labels → absorb each false negative into policy."""
     before_p = len(tcb.learning.learned_patterns)
     before_h = len(tcb.learning.learned_hosts)
     for ev in fn_events:
         tcb.report_missed_attack(
             ev["tool"],
             ev["args"],
-            note=f"fn:{ev['scenario']}:{ev['step']}",
+            note=f"fn:{ev['case_id']}:{ev['step']}",
             data=ev.get("data_channel"),
         )
     return {
@@ -185,7 +220,6 @@ def run_tier(
     do_train: bool,
 ) -> tuple[dict[str, Any], SecurityPolicy]:
     scenarios = by_difficulty(tier)
-    # Score-before uses a clone so scoring audit does not matter; policy is shared state
     before = score(scenarios, policy, phase=f"{tier}:before")
     learn_stats: dict[str, Any] = {
         "fns_absorbed": 0,
@@ -204,11 +238,6 @@ def run_tier(
         learn_stats["trained"] = True
 
     after = score(scenarios, policy, phase=f"{tier}:after")
-    # Drop internal handles
-    before.pop("_tcb", None)
-    after.pop("_tcb", None)
-    b_f1 = before["rates"]["f1"]
-    a_f1 = after["rates"]["f1"]
     return {
         "difficulty": tier,
         "trained": do_train,
@@ -221,12 +250,17 @@ def run_tier(
                 - before["rates"]["attack_block_rate_tpr"],
                 4,
             ),
+            "asr": round(
+                after["rates"]["attack_success_rate_asr"]
+                - before["rates"]["attack_success_rate_asr"],
+                4,
+            ),
             "fpr": round(
                 after["rates"]["false_positive_rate"]
                 - before["rates"]["false_positive_rate"],
                 4,
             ),
-            "f1": round(a_f1 - b_f1, 4),
+            "f1": round(after["rates"]["f1"] - before["rates"]["f1"], 4),
             "fn_count": before["counts"]["fn"] - after["counts"]["fn"],
         },
         "fn_events_before": before["fn_events"],
@@ -257,20 +291,27 @@ def run() -> dict:
         all_steps.extend(result["steps_before"])
         all_steps.extend(result["steps_after"])
 
-    # Aggregate: after-learning on train tiers + held_out after warm-start (no train)
     summary_rows = []
     for tier in TIERS:
         t = tiers_out[tier]
+        br, ar = t["before"]["rates"], t["after"]["rates"]
         summary_rows.append(
             {
                 "difficulty": tier,
                 "trained": t["trained"],
-                "before_tpr": t["before"]["rates"]["attack_block_rate_tpr"],
-                "after_tpr": t["after"]["rates"]["attack_block_rate_tpr"],
-                "before_fpr": t["before"]["rates"]["false_positive_rate"],
-                "after_fpr": t["after"]["rates"]["false_positive_rate"],
-                "before_f1": t["before"]["rates"]["f1"],
-                "after_f1": t["after"]["rates"]["f1"],
+                "before_tpr": br["attack_block_rate_tpr"],
+                "after_tpr": ar["attack_block_rate_tpr"],
+                "before_asr": br["attack_success_rate_asr"],
+                "after_asr": ar["attack_success_rate_asr"],
+                "before_fpr": br["false_positive_rate"],
+                "after_fpr": ar["false_positive_rate"],
+                "before_f1": br["f1"],
+                "after_f1": ar["f1"],
+                "before_containment": br["containment_rate"],
+                "after_containment": ar["containment_rate"],
+                "before_utility": br["utility_retention"],
+                "after_utility": ar["utility_retention"],
+                "mediation": ar["complete_mediation_rate"],
                 "fns_before": t["before"]["counts"]["fn"],
                 "fns_after": t["after"]["counts"]["fn"],
                 "patterns_added": t["learning"].get("patterns_added", 0),
@@ -278,38 +319,46 @@ def run() -> dict:
             }
         )
 
+    executable_case_ids = sorted({s.case_id for s in SCENARIOS})
     return {
         "paper": "arXiv:2605.18991 — Agent Security is a Systems Problem",
+        "dataset": {
+            "catalog_cases": len(CASES),
+            "executable_scenarios": len(SCENARIOS),
+            "executable_case_ids": executable_case_ids,
+            "collections": {
+                "historical": sum(1 for c in CASES if c.collection == "historical"),
+                "reproducible": sum(1 for c in CASES if c.collection == "reproducible"),
+                "novel": sum(1 for c in CASES if c.collection == "novel"),
+            },
+            "note": (
+                "Catalog holds all 45 brief cases; executable scenarios are "
+                "synthetic tool traces for architecture testing (not live exploits)."
+            ),
+        },
         "harness": {
-            "loop": "for tier in easy→hard→held_out: score → absorb FNs (train tiers) → re-score",
-            "warm_start": "policy carries forward across tiers",
+            "loop": "for tier in easy→hard→held_out: score → absorb FNs (train) → re-score",
+            "warm_start": True,
             "train_tiers": sorted(TRAIN_TIERS),
             "held_out_trains": False,
-            "gate_code_frozen": True,
-            "scenario_count": len(SCENARIOS),
+            "gate_code_policy": "detectors+RBAC+TCB invariants; difficulty in dataset",
         },
         "tiers": tiers_out,
         "summary": summary_rows,
         "learned_policy_snapshot": {
             "blocked_hosts": sorted(policy.network.blocked_hosts),
-            "extra_injection_patterns": sorted(
-                policy.content.extra_injection_patterns
-            )[:20],
             "extra_pattern_count": len(policy.content.extra_injection_patterns),
         },
         "steps": all_steps,
         "interpretation": {
-            "easy_before_high": "Baseline detectors fit canonical attacks.",
-            "hard_before_drop": "Obfuscation / novel phrasing exposes heuristic gaps.",
-            "hard_after_lift": "Absorbing labeled FNs should raise TPR on the same tier.",
-            "held_out": (
-                "No absorb on held_out; after scores show whether hard learning "
-                "generalizes (string/host promotion often does not)."
+            "research_question": (
+                "Can a system-level security architecture prevent unauthorized "
+                "actions and data flows even when the agent is manipulated?"
             ),
-            "fpr_note": (
-                "Educational pages that quote attack phrases may raise FPR; "
-                "learning never absorbs FPs (fail-closed teacher is attack-only)."
-            ),
+            "asr": "Lower is better — share of attack steps that were allowed.",
+            "containment": "Higher is better — share of attack steps blocked.",
+            "utility_retention": "Higher is better — benign steps still allowed.",
+            "held_out": "No absorb; measures generalization beyond train tiers.",
         },
     }
 
@@ -319,28 +368,29 @@ def main() -> None:
     out_dir = ROOT / "results"
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / "metrics.json"
+    catalog_path = out_dir / "catalog.json"
     out_path.write_text(json.dumps(metrics, indent=2))
+    catalog_path.write_text(json.dumps(catalog_json(), indent=2))
 
-    print("=== Agent Security Gate — difficulty harness ===")
+    print("=== Agent Security Gate — paper/OWASP/emerging harness ===")
+    ds = metrics["dataset"]
     print(
-        f"loop: score → learn(FNs) → re-score | warm_start | "
-        f"train={sorted(TRAIN_TIERS)} | held_out=eval-only"
+        f"catalog={ds['catalog_cases']} cases | "
+        f"executable={ds['executable_scenarios']} scenarios | "
+        f"collections={ds['collections']}"
     )
     for row in metrics["summary"]:
         print(
             f"[{row['difficulty']:8}] "
-            f"TPR {row['before_tpr']:.2%}→{row['after_tpr']:.2%}  "
-            f"FPR {row['before_fpr']:.2%}→{row['after_fpr']:.2%}  "
-            f"F1 {row['before_f1']:.3f}→{row['after_f1']:.3f}  "
-            f"FN {row['fns_before']}→{row['fns_after']}  "
-            f"+patterns={row['patterns_added']} +hosts={row['hosts_added']}"
+            f"TPR {row['before_tpr']:.0%}→{row['after_tpr']:.0%}  "
+            f"ASR {row['before_asr']:.0%}→{row['after_asr']:.0%}  "
+            f"FPR {row['before_fpr']:.0%}→{row['after_fpr']:.0%}  "
+            f"util {row['before_utility']:.0%}→{row['after_utility']:.0%}  "
+            f"F1 {row['before_f1']:.2f}→{row['after_f1']:.2f}  "
+            f"FN {row['fns_before']}→{row['fns_after']}"
         )
-    snap = metrics["learned_policy_snapshot"]
-    print(
-        f"policy after harness: blocked_hosts={len(snap['blocked_hosts'])} "
-        f"extra_patterns={snap['extra_pattern_count']}"
-    )
     print(f"wrote {out_path}")
+    print(f"wrote {catalog_path}")
 
 
 if __name__ == "__main__":
