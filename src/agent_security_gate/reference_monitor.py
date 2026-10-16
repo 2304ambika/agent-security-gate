@@ -6,7 +6,14 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from .detectors import Finding, check_network, check_prompt_injection, check_secret_in_args
+from .detectors import (
+    Finding,
+    check_network,
+    check_prompt_injection,
+    check_secret_in_args,
+    check_sensitive_paths,
+    check_tcb_invariants,
+)
 from .policy import SecurityPolicy, TrustLevel
 from .roles import TaskIdentity, tool_allowed
 
@@ -63,6 +70,16 @@ class ReferenceMonitor:
 
         findings.extend(check_network(req.tool, req.args, self.policy.network))
         findings.extend(check_secret_in_args(req.args))
+        findings.extend(check_sensitive_paths(req.tool, req.args, self.policy))
+        findings.extend(
+            check_tcb_invariants(
+                req.tool,
+                req.args,
+                req.data_channel,
+                req.data_trust,
+                self.policy.content,
+            )
+        )
 
         if req.data_channel:
             findings.extend(
