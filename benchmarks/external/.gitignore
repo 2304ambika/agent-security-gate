@@ -1,0 +1,8 @@
+# Large raw downloads (regenerate via download_external.sh)
+a3s/injected.json
+lakera_b3/selected_attacks_low-quality.csv
+injecagent/test_cases_*.json
+fujitsu/
+coding_agent/test.parquet
+coding_agent/rows_*.json
+**/__pycache__/
