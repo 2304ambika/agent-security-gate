@@ -4,18 +4,22 @@
 from __future__ import annotations
 
 import json
+import logging
 import statistics
 import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "benchmarks" / "data"))
 
 from agent_security_gate.policy import SecurityPolicy, default_policy  # noqa: E402
 from agent_security_gate.tcb import SecurityTCB  # noqa: E402
 from catalog import CASES, catalog_json  # noqa: E402
 from scenarios import SCENARIOS, Difficulty, Scenario, by_difficulty  # noqa: E402
+
+log = logging.getLogger("agent_security_gate")
 
 TIERS: tuple[Difficulty, ...] = ("easy", "hard", "held_out")
 TRAIN_TIERS: frozenset[Difficulty] = frozenset({"easy", "hard"})
@@ -96,6 +100,10 @@ def score(
     case_ids: set[str] = set()
 
     for sc in scenarios:
+        log.info(
+            "===== [%s] scenario=%s case=%s family=%s attack=%s =====",
+            phase, sc.id, sc.case_id, sc.family, sc.is_attack,
+        )
         tcb.begin_task(sc.principal, sc.task, role=sc.role)
         tools_u += tcb.unrestricted_tool_count()
         tools_g += tcb.privilege_count()
@@ -108,6 +116,7 @@ def score(
                 step.args,
                 data_channel=step.data_channel,
                 data_trust=step.data_trust,
+                expect_allow=not step.expect_block,
             )
             blocked = not res.decision.allowed
             latencies.append(res.decision.latency_ms)
@@ -213,12 +222,36 @@ def train_on_fns(tcb: SecurityTCB, fn_events: list[dict]) -> dict[str, int]:
     }
 
 
+def cross_validate(tier: Difficulty, base: SecurityPolicy) -> dict[str, Any]:
+    """2-fold by case_id: learn on one fold's FNs, score the *unseen* other fold."""
+    import copy
+
+    scs = by_difficulty(tier)
+    ids = sorted({s.case_id for s in scs})
+    folds = [set(ids[0::2]), set(ids[1::2])]
+    tp = fn = 0
+    for i in (0, 1):
+        train = tuple(s for s in scs if s.case_id in folds[i])
+        test = tuple(s for s in scs if s.case_id in folds[1 - i])
+        pol = copy.deepcopy(base)
+        trainer = SecurityTCB(policy=pol)
+        _stub_tools(trainer)
+        train_on_fns(trainer, score(train, pol, phase=f"{tier}:cv-train")["fn_events"])
+        c = score(test, pol, phase=f"{tier}:cv-test")["counts"]
+        tp += c["tp"]
+        fn += c["fn"]
+    return {"unseen_tpr": round(tp / (tp + fn), 4) if tp + fn else None, "tp": tp, "fn": fn}
+
+
 def run_tier(
     tier: Difficulty,
     policy: SecurityPolicy,
     *,
     do_train: bool,
 ) -> tuple[dict[str, Any], SecurityPolicy]:
+    import copy
+
+    base_policy = copy.deepcopy(policy)
     scenarios = by_difficulty(tier)
     before = score(scenarios, policy, phase=f"{tier}:before")
     learn_stats: dict[str, Any] = {
@@ -237,8 +270,10 @@ def run_tier(
     elif do_train:
         learn_stats["trained"] = True
 
+    cv = cross_validate(tier, base_policy) if do_train else None
     after = score(scenarios, policy, phase=f"{tier}:after")
     return {
+        "cv_unseen": cv,
         "difficulty": tier,
         "trained": do_train,
         "before": {k: before[k] for k in ("counts", "rates", "latency_ms", "by_family")},
@@ -286,6 +321,7 @@ def run() -> dict:
                 "learning",
                 "delta",
                 "fn_events_before",
+                "cv_unseen",
             )
         }
         all_steps.extend(result["steps_before"])
@@ -364,8 +400,10 @@ def run() -> dict:
 
 
 def main() -> None:
+    if "--verbose" in sys.argv or "-v" in sys.argv:
+        logging.basicConfig(level=logging.INFO, format="%(levelname)-5s %(message)s")
     metrics = run()
-    out_dir = ROOT / "results"
+    out_dir = ROOT / "results" / "offline"
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / "metrics.json"
     catalog_path = out_dir / "catalog.json"
@@ -388,6 +426,7 @@ def main() -> None:
             f"util {row['before_utility']:.0%}→{row['after_utility']:.0%}  "
             f"F1 {row['before_f1']:.2f}→{row['after_f1']:.2f}  "
             f"FN {row['fns_before']}→{row['fns_after']}"
+            + (f"  | unseen-fold TPR {cv['unseen_tpr']:.0%}" if (cv := metrics['tiers'][row['difficulty']].get('cv_unseen')) else "")
         )
     print(f"wrote {out_path}")
     print(f"wrote {catalog_path}")

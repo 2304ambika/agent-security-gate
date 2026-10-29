@@ -1,0 +1,13 @@
+[
+  {
+    "version": 1,
+    "parent": 0,
+    "kind": "injection_pattern",
+    "value": "(?is)\\A(?=.*\\bEXTERNAL_DIRECTIVE_v9\\b)",
+    "evidence": "novel_phrasing",
+    "accepted": true,
+    "reason": "ok",
+    "regressions": 0,
+    "ts": 1793276201.627698
+  }
+]
