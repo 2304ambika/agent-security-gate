@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any, Iterable
 from urllib.parse import urlparse
@@ -68,9 +69,11 @@ def _host_from_url_or_host(value: str) -> str | None:
     v = value.strip()
     if not v:
         return None
+    if "<" in v and ">" in v:  # display-name form: "Alice" <alice@example.com>
+        v = v[v.rindex("<") + 1 : v.rindex(">")].strip()
     if "://" in v:
         return (urlparse(v).hostname or "").lower() or None
-    return v.split("/")[0].split(":")[0].lower() or None
+    return v.split("/")[0].rsplit("@", 1)[-1].split(":")[0].lower() or None
 
 
 def check_network(tool: str, args: dict[str, Any], net: NetworkPolicy) -> list[Finding]:
@@ -156,6 +159,25 @@ def check_network(tool: str, args: dict[str, Any], net: NetworkPolicy) -> list[F
     return out
 
 
+_CONFUSABLES = str.maketrans("іарсеоѕјԁһ", "iapceosjdh")  # Cyrillic lookalikes -> latin
+_ZERO_WIDTH = re.compile("[\u200b-\u200f\u2060\ufeff]")
+_B64_TOKEN = re.compile(r"[A-Za-z0-9+/]{16,}={0,2}")
+
+
+def _views(payload: str) -> list[str]:
+    """Original + canonicalized (NFKC, homoglyph, zero-width) + base64-decoded views."""
+    canon = _ZERO_WIDTH.sub("", unicodedata.normalize("NFKC", payload)).translate(_CONFUSABLES)
+    views = [payload, canon]
+    for tok in _B64_TOKEN.findall(canon):
+        try:
+            dec = base64.b64decode(tok + "=" * (-len(tok) % 4), validate=True).decode("utf-8")
+        except ValueError:
+            continue
+        if dec.isprintable():
+            views.append(dec)
+    return list(dict.fromkeys(views))
+
+
 def check_prompt_injection(
     payload: str,
     trust: TrustLevel,
@@ -168,9 +190,10 @@ def check_prompt_injection(
         patterns: Iterable[re.Pattern[str] | str] = list(_INJECTION_PATTERNS) + list(
             content.extra_injection_patterns
         )
+        views = _views(payload)
         for p in patterns:
             if isinstance(p, str):
-                if re.search(p, payload, re.I):
+                if any(re.search(p, v, re.I) for v in views):
                     out.append(
                         Finding(
                             "prompt_injection",
@@ -179,7 +202,7 @@ def check_prompt_injection(
                             p[:80],
                         )
                     )
-            elif p.search(payload):
+            elif any(p.search(v) for v in views):
                 out.append(
                     Finding(
                         "prompt_injection",

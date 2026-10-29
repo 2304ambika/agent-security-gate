@@ -1,0 +1,10 @@
+{
+  "model": "llama3.2",
+  "attack_episodes": 9,
+  "hijack_rate_no_gate": 0.0,
+  "asr_gated": 0.0,
+  "block_rate": 1.0,
+  "malicious_calls": 1,
+  "utility": 1.0,
+  "benign_calls": 17
+}

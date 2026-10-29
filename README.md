@@ -1,214 +1,63 @@
 # Agent Security Gate
 
-Feasibility prototype for a **system-level** security architecture around agentic AI, grounded in [arXiv:2605.18991](https://arxiv.org/abs/2605.18991) (*Agent Security is a Systems Problem*).
+A research prototype: put a small, deterministic **reference monitor** in front of every tool an LLM agent can call, so that unauthorized actions and data flows fail **even when the model has been manipulated**. Grounded in [arXiv:2605.18991](https://arxiv.org/abs/2605.18991) (*Agent Security is a Systems Problem*). The LLM is untrusted and no model sits inside the trusted code.
 
-**Research question:** Can a system-level security architecture prevent unauthorized actions and data flows even when the agent itself is successfully manipulated by adversarial input?
+Two ideas are built on top of the basic gate:
 
----
+1. **History-aware, risk-adaptive gating** (`src/agent_security_gate/session.py`). The gate tracks provenance itself, so a later call is judged against what the session has already read: recipients or paths taken from untrusted content, secrets leaving in any encoding, effects after injected text. Cheap structural checks run on every call, and the expensive scan can be deferred on read-only calls.
+2. **Verified policy-update harness** (`src/agent_security_gate/policy_update.py`). Labelled false negatives become new block rules only if they pass a benign regression check. Rules only narrow policy, every change is versioned and can be rolled back, and anything that would relax policy is queued for a human.
 
-## Problem noticed
+How a tool call flows and how the harness works: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. What was measured and what was not claimed: **[docs/EVALUATION.md](docs/EVALUATION.md)**.
 
-Agentic systems fail in ways that model-only defenses do not fix:
-
-1. **The model is an unreliable component.** Prompt injection, tool misuse, and goal hijacking keep succeeding even after alignment-style mitigations. Treating “make the LLM refuse better” as the primary control is insufficient.
-2. **Security principles are missing or incomplete at the system boundary.** Real incidents (Copilot EchoLeak, ChatGPT SpAIware, Claude DNS exfil, Devin exposure, Cursor AgentFlayer, Amp config tampering, Operator/ClickFix, and others) map to failures of least privilege, complete mediation, TCB tamper resistance, instruction/data separation, and information-flow control.
-3. **Policies are dynamic and task-specific.** Unlike a fixed app install, agents change goals mid-trajectory, so over-broad tool access and mutable “security config” become attack surfaces.
-4. **Evaluation often measures the wrong thing.** Refusing a malicious prompt is not enough if the same objective still succeeds via shell, DNS, browser, MCP, memory, or another agent.
-
-Without an external enforcement layer, a compromised or manipulated agent can still call tools, leak secrets, expose ports, poison memory, or cross trust domains.
-
----
-
-## Solution proposed
-
-Treat the **LLM as untrusted**. Put a small **Trusted Computing Base (TCB)** in front of every tool:
-
-| Piece | Role |
-| --- | --- |
-| **Security policy** | Declarative allow/deny rules (network, content, sensitive paths, tool→capability map) |
-| **Task-scoped RBAC** | Least privilege derived from the current task/role |
-| **Reference monitor** | Deterministic approve/deny on **every** tool request (complete mediation) |
-| **Detectors / TCB invariants** | DNS exfil, prompt-injection cues in EXTERNAL data, secrets in args, memory/config immutability, public bind, clipboard/ANSI, MCP/A2A trust, destructive deletes |
-| **Learning harness** | On labeled false negatives, promote hosts/patterns into policy; re-score (eval loop, not an LLM inside the TCB) |
-
-Agents never hold raw tool handles. The only path is:
-
-```text
-task → identity/role → SecurityTCB.invoke → reference monitor → (allow?) → tool
-```
-
-This implements the paper’s stance: enforce invariants **outside** the model—instruction/data separation, verifiable least privilege, and information-flow control—so unauthorized actions fail even if the model “agrees” with the attacker.
-
----
-
-## What is included in the dataset
-
-Three collections (per the research brief), not a flat list of incident names:
-
-### 1. Historical incident catalog (`benchmarks/catalog.py` → `results/catalog.json`)
-
-**45 cases** with a shared schema (`case_id`, evidence type, entry vector, asset at risk, attack goal, expected control, severity, reproducibility, collection):
-
-| Range | Source | Count (approx.) |
-| --- | --- | --- |
-| **P01–P11** | Paper’s 11 representative attacks | 11 |
-| **O12–O42** | OWASP Agentic Security–style expansions (coding agents, MCP/supply chain, identity/A2A, memory/destructive classes) | 31 |
-| **E43–E45** | Emerging / developing reports (e.g. CERT-In–style live egress, unintended browser submits, sandbox escape probes) | 3 |
-
-Evidence labels distinguish confirmed incident, reported vulnerability, research demonstration, synthetic scenario, and developing report.
-
-### 2. Reproducible attack benchmark (`benchmarks/scenarios.py`)
-
-**32 executable synthetic scenarios** (tool-call traces with ground-truth `expect_block`). These exercise the gate in isolation—**no live exploits** against production systems.
-
-Threat categories covered:
-
-- **A.** Prompt injection / goal hijacking  
-- **B.** Data exfiltration / privacy  
-- **C.** Unauthorized tool use / code execution  
-- **D.** Identity, privilege, trust-boundary failures  
-- **E.** Memory poisoning, destructive actions, cascading / A2A failures  
-
-### 3. Difficulty tiers (same gate code; harder *data*)
-
-| Tier | Contents | Learning |
-| --- | --- | --- |
-| **easy** | Paper P01–P11 canonical patterns + benign utility | Train on FNs (usually none) |
-| **hard** | OWASP-mapped traces + novel phrasing + FPR stress (security blog) | Train on FNs |
-| **held_out** | Novel PI / memory / A2A + emerging E43–E45 | **Eval only** (no absorb) |
-
-Harness loop:
-
-```text
-policy = baseline
-for tier in easy → hard → held_out:
-  score(tier)                   # before
-  if tier in {easy, hard}:
-    absorb labeled false negatives
-  score(tier)                   # after  (policy warm-starts to next tier)
-```
-
----
-
-## Metrics
-
-Architecture-oriented metrics (not “did the model refuse?”):
-
-| Metric | Direction | Meaning |
-| --- | --- | --- |
-| **ASR** (attack success rate) | ↓ better | Share of attack steps that were **allowed** |
-| **Containment / TPR** | ↑ better | Share of attack steps **blocked** |
-| **False-block / FPR** | ↓ better | Share of benign steps wrongly blocked |
-| **Utility retention** | ↑ better | Share of benign steps still allowed |
-| **Complete mediation** | = 1.0 | Every tool call hit the reference monitor |
-| **Policy enforcement coverage** | ↑ better | Same mediation invariant for security-relevant actions |
-| **Privilege reduction** | ↑ better | \(1 - \text{avg granted tools} / \text{all tools}\) under task RBAC |
-| **F1 / accuracy** | ↑ better | Step-level allow/deny quality on the labeled set |
-| **Latency (p50/p95)** | ↓ better | Monitor overhead only (not model time) |
-
-Latest run (`python3 benchmarks/run_bench.py` → `results/metrics.json`):
-
-| Tier | TPR before→after | ASR before→after | FPR | Utility | FN before→after |
-| --- | --- | --- | --- | --- | --- |
-| easy | 100%→100% | **0%→0%** | 0% | 100% | 0→0 |
-| hard | 91%→100% | **9%→0%** | 100%* | 0%* | 1→0 |
-| held_out | 83%→83% | **17%→17%** | 0% | 100% | 1→1 |
-
-\*Hard FPR/utility reflect a single benign EXTERNAL security-blog case that quotes classic injection phrases (1/1).
-
----
-
-## Observation
-
-1. **Complete mediation is achievable and cheap.** Every tool call is gated; monitor latency stays in the sub-millisecond range—negligible vs LLM time.
-2. **Paper patterns (easy) are containable with deterministic controls.** P01–P11-style traces (EchoLeak PI, SpAIware memory write, DNS exfil, public bind, `.env`, Jira→secrets, config tamper, token exfil, ANSI terminal, Operator PII submit, ClickFix clipboard) all blocked → **ASR 0%** without learning.
-3. **Structural controls transfer better than string heuristics.** DNS allowlists, encoded-label checks, RBAC, immutable config, EXTERNAL→memory deny, and sensitive-path rules stop many OWASP-mapped hard cases even when wording changes.
-4. **Semantic / novel input on allowlisted destinations remains the gap.** Hard FN `ADV01` (novel phrasing) is fixed by labeled absorb; held-out `ADV02` (`PROTOCOL_MIRAGE`) still succeeds → **ASR 17%**—snippet learning memorizes, it does not generalize.
-5. **Utility vs strict EXTERNAL scanning is a real trade-off.** Quoting attack phrases in a benign security article triggers false blocks when trust is EXTERNAL.
-6. **Learning helps only with a trusted teacher.** The harness uses ground-truth labels (or would use a human/offline judge in production). An LLM inside the TCB would reintroduce the paper’s “probabilistic reference monitor” failure mode.
-
----
-
-## Conclusion
-
-The prototype supports the paper’s thesis for this benchmark: **security must be enforced at the system boundary**, not trusted to the model.
-
-- When attacks map to **tool misuse, egress, privilege, memory/config integrity, or IFC-visible secrets**, the reference monitor can drive **ASR to zero** on the paper’s canonical set and recover hard-tier misses via policy absorb.
-- Residual risk is concentrated in **instruction-like content that does not match detectors** and in **over-blocking educational EXTERNAL text**—problems of detector generality and policy nuance, not of missing mediation.
-- Therefore the right research/engineering focus is: keep the TCB deterministic and complete; improve **verifiable policy generation**, **instruction/data separation**, and **IFC**, while treating held-out ASR and false-block rate as first-class metrics alongside containment.
-
----
-
-## Glossary (acronyms & terms)
-
-| Term | Full form / meaning |
-| --- | --- |
-| **TCB** | Trusted Computing Base — code/data that must stay correct even under attack (here: policy + reference monitor + invariants) |
-| **Reference monitor** | Component that checks every request against the security policy (approve or deny) |
-| **RBAC** | Role-Based Access Control — permissions granted by role/task (e.g. researcher vs ops) |
-| **IFC** | Information-Flow Control — tracking/restricting where sensitive data may flow |
-| **LLM** | Large Language Model — the AI model driving the agent (treated as untrusted) |
-| **PI** | Prompt Injection — malicious instructions in data (email, web, files) that steer the agent |
-| **ASR** | Attack Success Rate — share of attack steps that were **allowed** (lower is better) |
-| **TPR** | True Positive Rate — share of attacks correctly **blocked** (also called recall / containment here) |
-| **FPR** | False Positive Rate — share of benign steps wrongly **blocked** (false-block rate) |
-| **TP / FP / TN / FN** | True Positive / False Positive / True Negative / False Negative — confusion-matrix counts for allow/deny |
-| **F1** | Harmonic mean of precision and recall — balances “when we block, are we right?” and “did we catch attacks?” |
-| **MCP** | Model Context Protocol — standard for connecting agents to external tools/servers |
-| **A2A** | Agent-to-Agent — one agent messaging or steering another |
-| **DNS** | Domain Name System — name→IP lookup; abused to sneak data out in query names |
-| **PII** | Personally Identifiable Information — e.g. email, SSN, passport-like data |
-| **DLP** | Data Loss Prevention — controls that stop sensitive data leaving authorized destinations |
-| **RCE** | Remote Code Execution — attacker causes code to run on the host |
-| **XSS** | Cross-Site Scripting — injecting script into a web page viewed by a victim |
-| **ANSI (escapes)** | Control sequences in terminal output that can manipulate display/clipboard |
-| **CVE** | Common Vulnerabilities and Exposures — public vulnerability ID scheme |
-| **OWASP** | Open Worldwide Application Security Project — community that tracks web/agent security risks |
-| **CERT-In** | Indian Computer Emergency Response Team — India’s national cyber incident agency |
-| **CRM** | Customer Relationship Management — business system holding customer records |
-| **API** | Application Programming Interface — programmatic service endpoint (often needs keys) |
-| **HTTP / HTTPS** | Hypertext Transfer Protocol (Secure) — web request protocols |
-| **p50 / p95** | 50th / 95th percentile — latency points (median and high-tail) |
-| **EXTERNAL** | Trust level for untrusted channels (web, tickets, tool output) — treated as data, not instructions |
-
----
-
-## Run
+## Quick start
 
 ```bash
-python3 demo.py
-python3 benchmarks/run_bench.py              # → results/metrics.json, results/catalog.json
-python3 benchmarks/run_external_bench.py     # Hendar + hard external suites
-python3 tests/test_gate.py
+make test        # unit tests (no dependencies beyond Python 3.10+)
+make demo        # 3 calls through the gate: allow, injected deny, RBAC deny
+make live-mock   # scripted hijackable agent in a real tool loop, with the gate trace
+make ideas       # idea 1 (sessions + red-team variants) and idea 2 (in-repo tiers)
+make cross       # idea 2 on external data: train on datasets, test on separate benchmarks
 ```
 
-Refresh external dumps (optional):
+All other targets: `make help`. Metrics go to `results/offline/` and `results/llm/`; logs go to `logs/` (git-ignored). The Makefile sets `PYTHONPATH=src`.
 
-```bash
-bash benchmarks/download_external.sh
-python3 benchmarks/prepare_hard_sets.py
-```
+## Layout
 
-### External / hard suites
+| Path | What is there |
+|---|---|
+| `src/agent_security_gate/` | The system under test: `tcb`, `reference_monitor`, `roles`, `policy`, `detectors`, `session` (idea 1), `policy_update` (idea 2), `learning` (older baseline learner) |
+| `benchmarks/data/` | Datasets and adapters: `catalog.py` (45 incidents), `scenarios.py` (48 synthetic scenarios, easy/hard/held-out), `session_scenarios.py` and `session_variants.py` (multi-step sessions), `external_adapters.py`, `external/` (downloaded corpora) |
+| `benchmarks/runners/` | Evaluations that need no LLM: `run_bench`, `run_ideas_bench`, `run_cross_dataset_bench`, `run_split_bench`, `run_external_bench` |
+| `benchmarks/llm/` | Real agents behind the gate: `live_agent.py` (Claude or mock), `llm_eval.py` (Ollama) |
+| `examples/demo.py` | Smallest end-to-end example |
+| `tests/` | `test_gate.py`, `test_session_and_updates.py` (includes a regression guard over the red-team variants) |
+| `docs/` | `ARCHITECTURE.md`, `EVALUATION.md`, `GLOSSARY.md`, `BACKGROUND.md` (problem, dataset design, metric definitions), `RESEARCH_SUMMARY.md` (earlier write-up) |
+| `results/` | Committed metrics JSON |
 
-| Suite | Source | What we keep |
-| --- | --- | --- |
-| `internal` | `benchmarks/scenarios.py` | baseline synthetic |
-| `hendar` | [Hendar](https://huggingface.co/datasets/h0000w/hendar-agentic-ai-dataset) | PI / unsafe tools / policy / multi-agent |
-| `lakera_l2` | [Lakera B3](https://huggingface.co/datasets/Lakera/b3-agent-security-benchmark-weak) | defense level 2 only |
-| `injecagent_hard` | [InjecAgent](https://github.com/uiuc-kang-lab/InjecAgent) | hard IPI + attacker-tool attempts |
-| `a3s_hard` | [A3S-Bench](https://huggingface.co/datasets/inclusionAI/A3S-Bench) | high-risk injection cases |
-| `agentharm_toolish` | [AgentHarm](https://huggingface.co/datasets/ai-safety-institute/AgentHarm) | toolish harmful plans |
-| `coding_agent` | [coding-agent-security-benchmark](https://huggingface.co/datasets/rogue-security/coding-agent-security-benchmark) | labeled session messages |
+## Status in one table
 
-### Layout
+| Question | Result | Where |
+|---|---|---|
+| Stateless gate on the paper's 11 attacks | ASR 0% | `make bench` |
+| Session gate, 13 sessions where the caller attaches no provenance | ASR 100% (stateless) to 0% | `make ideas` |
+| Session gate, 42 red-team variants (tuned after a first pass) | ASR 97% to 15%; the 15% are declared gaps | `make ideas` |
+| Verified learning, train on datasets, test on separate benchmarks | Small gains (A3S +1 to +11 pp, Lakera up to about +4 pp); FPR rose from 10% to 30% on a domain with no benign regression data | `make cross` |
+| Verified learning, same-dataset split | Pooled TPR 68% to 82%, FPR to 13.7% | `make split` |
 
-| Path | Purpose |
-| --- | --- |
-| `src/agent_security_gate/` | TCB, policy, roles, detectors, reference monitor, learning |
-| `benchmarks/catalog.py` | 45-case historical/schema catalog |
-| `benchmarks/scenarios.py` | Executable synthetic scenarios by difficulty |
-| `benchmarks/run_bench.py` | Train→re-eval harness + architecture metrics |
-| `benchmarks/external_adapters.py` | HF/GitHub → Scenario |
-| `benchmarks/run_external_bench.py` | Multi-suite external comparison |
-| `results/` | Latest metrics, catalog, and external metrics |
+Not claimed: robustness to an adaptive attacker, results on a live agent, or any comparison against published systems (CaMeL, Fides, Progent, PCAS, APPA). The scenarios are written for this repo.
+
+## Data
+
+External corpora are downloaded by `benchmarks/data/download_external.sh` and prepared by `prepare_hard_sets.py`.
+
+| Suite | Source | Used as |
+|---|---|---|
+| `internal` | `scenarios.py` | synthetic baseline |
+| `hendar` | [Hendar](https://huggingface.co/datasets/h0000w/hendar-agentic-ai-dataset) | train dataset (prompt-injection config only) |
+| `coding_agent` | [rogue-security](https://huggingface.co/datasets/rogue-security/coding-agent-security-benchmark) | train dataset (has benign rows) |
+| `lakera_l2` | [Lakera B3](https://huggingface.co/datasets/Lakera/b3-agent-security-benchmark-weak) | test benchmark |
+| `injecagent_hard` | [InjecAgent](https://github.com/uiuc-kang-lab/InjecAgent) | test benchmark |
+| `a3s_hard` | [A3S-Bench](https://huggingface.co/datasets/inclusionAI/A3S-Bench) | test benchmark |
+| `agentharm_toolish` | [AgentHarm](https://huggingface.co/datasets/ai-safety-institute/AgentHarm) | test benchmark |
+
+Terms (TCB, ASR, IFC, ...): `docs/GLOSSARY.md`. Secrets: copy `.env.example` to `.env` (git-ignored); needed only for the live-Claude runs.

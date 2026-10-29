@@ -6,3 +6,4 @@ secrets.local.*
 __pycache__/
 *.py[cod]
 
+logs/*.log
