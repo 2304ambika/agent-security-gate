@@ -3,17 +3,29 @@ export PYTHONPATH := src
 PY ?= python3
 VENV_PY ?= .venv/bin/python
 
-.PHONY: help demo test ideas cross bench split split-internal external llm-eval live-mock live-attack live-benign
+.PHONY: p5 live-p4 approval poison redteam synth help demo test ideas cross bench split split-internal external llm-eval live-mock live-attack live-benign
 help:
 	@echo "NO LLM:   make test | demo | ideas | cross | bench | split | split-internal | external"
 	@echo "MOCK:     make live-mock            (scripted agent, no key)"
 	@echo "LOCAL LLM (ollama serve running): make llm-eval MODEL=llama3.2 N=3"
 	@echo "CLAUDE API (key + credits): make live-attack | live-benign"
 
+p5:               ## P5 offline: InjecAgent data-stealing cases, base vs slot policy
+	$(PY) benchmarks/runners/run_p5_injecagent.py
+live-p4:          ## P4: live Ollama agent on generator episodes; MODEL=llama3.2 (needs ollama serve)
+	$(PY) benchmarks/llm/run_live_p4.py collect --n 3 --seed 7 --model $(MODEL) && $(PY) benchmarks/llm/run_live_p4.py replay --n 3 --seed 7 --model $(MODEL)
+approval:         ## P3: hard-block vs ask-a-human for ungrounded targets
+	$(PY) benchmarks/runners/run_approval_tier.py
+poison:           ## P2: attacker link in email body, block vs redact
+	$(PY) benchmarks/runners/run_poison_redact.py
+redteam:          ## adaptive-attacker evasions against the grounded-slot rule (exit 1 on a miss)
+	$(PY) benchmarks/runners/run_redteam_slots.py
+synth:            ## leveled synthetic MAS data: none/flat/curriculum x text/slot rule learning
+	$(PY) benchmarks/runners/run_synth_curriculum.py > logs/synth.log 2>&1; tail -45 logs/synth.log
 demo:
 	$(PY) examples/demo.py
 test:
-	$(PY) tests/test_gate.py && $(PY) tests/test_session_and_updates.py
+	$(PY) tests/test_gate.py && $(PY) tests/test_session_and_updates.py && $(PY) benchmarks/runners/run_redteam_slots.py > /dev/null
 ideas:            ## idea 1 (session gating, red-team variants) + idea 2 (policy learning, in-repo tiers)
 	$(PY) benchmarks/runners/run_ideas_bench.py
 cross:            ## idea 2 on external data: train on datasets, test on separate benchmarks

@@ -1,0 +1,51 @@
+{
+  "none": {
+    "attack": [
+      275,
+      300
+    ],
+    "quote": [
+      0,
+      0,
+      30
+    ],
+    "benign": [
+      0,
+      0,
+      300
+    ]
+  },
+  "block_body": {
+    "attack": [
+      0,
+      300
+    ],
+    "quote": [
+      30,
+      0,
+      30
+    ],
+    "benign": [
+      0,
+      0,
+      300
+    ]
+  },
+  "redact_body": {
+    "attack": [
+      0,
+      300
+    ],
+    "quote": [
+      0,
+      30,
+      30
+    ],
+    "benign": [
+      0,
+      0,
+      300
+    ]
+  },
+  "evasions_surviving": "2/10"
+}

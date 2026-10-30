@@ -8,6 +8,7 @@ from typing import Any
 
 from .detectors import (
     Finding,
+    check_grounding,
     check_network,
     check_prompt_injection,
     check_secret_in_args,
@@ -36,6 +37,12 @@ class Decision:
     reason: str
     tier: str = "high"
     deep_scan: bool = True  # False = injection scan deferred (adaptive mode, low-risk call)
+
+    @property
+    def needs_approval(self) -> bool:
+        """Denied only because a target is not grounded in the user task: a human can resolve it (ask tier)."""
+        blocks = {f.detector for f in self.findings if f.severity == "block"}
+        return (not self.allowed) and blocks == {"ungrounded_arg"}
 
 
 @dataclass
@@ -103,9 +110,10 @@ class ReferenceMonitor:
             )
         )
 
+        findings.extend(check_grounding(req.tool, req.args, identity.task, ctx, trust, self.policy.content, self.policy.network))
         if ctx and deep:
             self.deep_scans += 1
-            inj = check_prompt_injection(ctx, trust, self.policy.content)
+            inj = check_prompt_injection(ctx, trust, self.policy.content, identity.task)
             findings.extend(inj)
             if inj and session is not None:
                 session.suspicious = True

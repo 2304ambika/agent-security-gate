@@ -29,6 +29,7 @@ class ToolResult:
     decision: Decision
     output: Any = None
     error: str | None = None
+    redacted: int = 0  # ungrounded links/addresses removed from free-text arguments before execution
 
 
 class SecurityTCB:
@@ -130,6 +131,16 @@ class SecurityTCB:
         if not decision.allowed:
             log.info("[#%d] HARNESS tool NOT executed (blocked by monitor)", n)
             return ToolResult(ok=False, decision=decision, error=decision.reason)
+        redacted = 0
+        slots = [a for t, a in self.policy.content.redact_slots if t == tool and isinstance(args.get(a), str)]
+        ctx = data_channel if data_trust == TrustLevel.EXTERNAL and data_channel else (self.session.ambient_text() if self.session else "")
+        if slots and ctx:
+            from .features import redact_ungrounded
+
+            args = dict(args)
+            for a in slots:
+                args[a], n = redact_ungrounded(args[a], self.identity.task, ctx, tool)
+                redacted += n
         handler = self._tools.get(tool)
         if handler is None:
             log.info("[#%d] HARNESS tool NOT executed (not registered)", n)
@@ -146,7 +157,7 @@ class SecurityTCB:
         log.info("[#%d] HARNESS tool executed, output=%s", n, _short(out))
         if self.session is not None:
             self.session.observe_output(tool, out, ingest=tool in INGEST_TOOLS)
-        return ToolResult(ok=True, decision=decision, output=out)
+        return ToolResult(ok=True, decision=decision, output=out, redacted=redacted)
 
     def report_missed_attack(self, tool: str, args: dict[str, Any], note: str, data: str | None = None) -> None:
         """Feedback loop: harden policy after a confirmed false negative."""

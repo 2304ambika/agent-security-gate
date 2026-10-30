@@ -182,10 +182,20 @@ def check_prompt_injection(
     payload: str,
     trust: TrustLevel,
     content: ContentPolicy,
+    task: str = "",
 ) -> list[Finding]:
     if trust != TrustLevel.EXTERNAL or not payload:
         return []
     out: list[Finding] = []
+    if content.learned_rules and content.treat_external_as_data_only and content.block_instruction_patterns_in_data:
+        from .features import extract, fires  # lazy: features -> session -> detectors
+
+        views = _views(payload)  # [payload, canonical, ...]; deduped, so canonical may be absent
+        segs = extract(views[min(1, len(views) - 1)], task)
+        for rule in content.learned_rules:
+            if fires(segs, rule):
+                out.append(Finding("prompt_injection", "block", "learned feature rule in external data", "+".join(rule)))
+                break
     if content.treat_external_as_data_only and content.block_instruction_patterns_in_data:
         patterns: Iterable[re.Pattern[str] | str] = list(_INJECTION_PATTERNS) + list(
             content.extra_injection_patterns
@@ -398,3 +408,21 @@ def check_tcb_invariants(
             )
 
     return out
+
+
+def check_grounding(tool: str, args: dict[str, Any], task: str, ctx: str | None, trust: TrustLevel, content: ContentPolicy,
+                    net: NetworkPolicy | None = None) -> list[Finding]:
+    """Learned slots: an effect argument built from untrusted context must be grounded in the user task."""
+    if trust != TrustLevel.EXTERNAL or not ctx or not content.grounded_slots:
+        return []
+    from .features import ungrounded  # lazy: features -> session -> detectors
+
+    if content.free_plain_reads and net is not None and tool == "http_fetch" and isinstance(args.get("url"), str):
+        u = urlparse(args["url"])
+        if u.hostname in net.allowed_hosts and not (u.query or u.fragment or u.username):
+            return []
+
+    for t, a in content.grounded_slots:
+        if t == tool and isinstance(args.get(a), str) and (bad := ungrounded(args[a], task, ctx, tool)):
+            return [Finding("ungrounded_arg", "block", f"{tool}.{a} names a target the user task did not authorize", sorted(bad)[0][:60])]
+    return []

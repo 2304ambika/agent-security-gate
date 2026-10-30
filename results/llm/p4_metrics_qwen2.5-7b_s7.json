@@ -1,0 +1,65 @@
+{
+  "no_gate": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 23,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 0,
+    "ben_calls": 243
+  },
+  "base": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 19,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 4,
+    "ben_calls": 243
+  },
+  "session(base)": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 15,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 11,
+    "ben_calls": 243
+  },
+  "slots-strict": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 10,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 25,
+    "ben_calls": 243
+  },
+  "slots": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 12,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 18,
+    "ben_calls": 243
+  },
+  "slots+redact": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 3,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 18,
+    "ben_calls": 243
+  },
+  "session+slots+redact": {
+    "atk_n": 72,
+    "hijacked": 23,
+    "breached": 4,
+    "ben_n": 72,
+    "ben_completed": 72,
+    "ben_blocked_calls": 25,
+    "ben_calls": 243
+  }
+}
