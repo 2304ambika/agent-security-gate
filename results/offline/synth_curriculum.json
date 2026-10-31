@@ -1,0 +1,2045 @@
+{
+  "seeds": 5,
+  "n_per": 12,
+  "aggregate": {
+    "none": {
+      "rules_n": 0,
+      "iid": {
+        "L1|attack": {
+          "tpr": 0.35416666666666663,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.34444444444444444,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.08333333333333333,
+        "story": 0.05666666666666667,
+        "checklist": 0.056666666666666664,
+        "terse": 0.07,
+        "dhijack": 0.08333333333333333,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.004761904761904762,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.5,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.32673267326732675,
+          "fpr": 0.10101010101010101
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "snippet": {
+      "rules_n": 0,
+      "iid": {
+        "L1|attack": {
+          "tpr": 0.35416666666666663,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.34444444444444444,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.08333333333333333,
+        "story": 0.05666666666666667,
+        "checklist": 0.056666666666666664,
+        "terse": 0.07,
+        "dhijack": 0.08333333333333333,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.004761904761904762,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.5,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.32673267326732675,
+          "fpr": 0.10101010101010101
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "verified_regex": {
+      "rules_n": 0,
+      "iid": {
+        "L1|attack": {
+          "tpr": 0.9916666666666667,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8583333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2375,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.31666666666666665,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.6666666666666666,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8277777777777778,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.2611111111111111,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2361111111111111,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.2361111111111111,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.5222222222222221,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.54,
+        "story": 0.48000000000000004,
+        "checklist": 0.47000000000000003,
+        "terse": 0.49333333333333335,
+        "dhijack": 0.35333333333333333,
+        "poison": 0.16333333333333333
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.08571428571428572,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.5765,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.35445544554455444,
+          "fpr": 0.1272727272727273
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "text/narrow/flat": {
+      "rules_n": 2,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.5333333333333333
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.6666666666666666,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.275
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.65
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.31666666666666665
+        },
+        "L2|attack": {
+          "tpr": 0.4861111111111111,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.6133333333333333,
+        "story": 0.8,
+        "checklist": 0.45666666666666667,
+        "terse": 0.47000000000000003,
+        "dhijack": 0.8,
+        "poison": 0.6433333333333333
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.11428571428571428,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.6325,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.33663366336633666,
+          "fpr": 0.10101010101010101
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "text/narrow/curr": {
+      "rules_n": 2,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.6166666666666667
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.7083333333333334,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.375
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.675
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.31666666666666665
+        },
+        "L2|attack": {
+          "tpr": 0.5527777777777778,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.6133333333333333,
+        "story": 0.8,
+        "checklist": 0.45666666666666667,
+        "terse": 0.47000000000000003,
+        "dhijack": 0.8,
+        "poison": 0.7733333333333333
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.09904761904761905,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.6194999999999999,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.44554455445544555,
+          "fpr": 0.2222222222222222
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "text/broad/flat": {
+      "rules_n": 1.8,
+      "iid": {
+        "L1|attack": {
+          "tpr": 0.85,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.016666666666666666
+        },
+        "L2|attack": {
+          "tpr": 0.7291666666666666,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.4722222222222222,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.1
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.65
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.13333333333333333
+        },
+        "L2|attack": {
+          "tpr": 0.1611111111111111,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.2,
+        "story": 0.22,
+        "checklist": 0.13666666666666666,
+        "terse": 0.15,
+        "dhijack": 0.29333333333333333,
+        "poison": 0.24
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.03619047619047619,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.5485,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3287128712871287,
+          "fpr": 0.10101010101010101
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "text/broad/curr": {
+      "rules_n": 2,
+      "iid": {
+        "L1|attack": {
+          "tpr": 0.8541666666666666,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.016666666666666666
+        },
+        "L2|attack": {
+          "tpr": 0.6708333333333333,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.49444444444444446,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.15
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.55
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.21666666666666667
+        },
+        "L2|attack": {
+          "tpr": 0.14166666666666666,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.2,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 0.21333333333333335,
+        "story": 0.25666666666666665,
+        "checklist": 0.13666666666666666,
+        "terse": 0.15,
+        "dhijack": 0.2733333333333333,
+        "poison": 0.21333333333333332
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 0.04380952380952381,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 0.5435,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3326732673267327,
+          "fpr": 0.10909090909090909
+        },
+        "internal": {
+          "tpr": 0.9433962264150944,
+          "fpr": 0.05
+        }
+      }
+    },
+    "slot/broad/flat": {
+      "rules_n": 3,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8861111111111112,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3465346534653465,
+          "fpr": 0.1111111111111111
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    },
+    "slot/broad/curr": {
+      "rules_n": 3,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8861111111111112,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3465346534653465,
+          "fpr": 0.1111111111111111
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    },
+    "both/broad/flat": {
+      "rules_n": 3,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8861111111111112,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3465346534653465,
+          "fpr": 0.1111111111111111
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    },
+    "both/broad/curr": {
+      "rules_n": 3,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8861111111111112,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3465346534653465,
+          "fpr": 0.1111111111111111
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    },
+    "both/broad/curr-noprune": {
+      "rules_n": 4.6,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.016666666666666666
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.9083333333333333,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.15
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.55
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.21666666666666667
+        },
+        "L2|attack": {
+          "tpr": 0.8694444444444445,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8666666666666667,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8666666666666667,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.21333333333333332
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.35247524752475246,
+          "fpr": 0.11919191919191918
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    },
+    "both/broad/reverse": {
+      "rules_n": 3,
+      "iid": {
+        "L1|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 1.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood": {
+        "L1|attack": {
+          "tpr": 0.8861111111111112,
+          "fpr": null
+        },
+        "L1|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_dir": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_edu": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_derived": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_quote": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L1|hard_breadth": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L2|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L2|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L3|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L3|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L4|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L4|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        },
+        "L5|attack": {
+          "tpr": 0.8333333333333334,
+          "fpr": null
+        },
+        "L5|benign": {
+          "tpr": null,
+          "fpr": 0.0
+        }
+      },
+      "ood_family": {
+        "markup": 1.0,
+        "story": 1.0,
+        "checklist": 1.0,
+        "terse": 1.0,
+        "dhijack": 1.0,
+        "poison": 0.06333333333333334
+      },
+      "ext": {
+        "lakera_l2": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "a3s_hard": {
+          "tpr": 1.0,
+          "fpr": null
+        },
+        "coding_agent": {
+          "tpr": 0.3465346534653465,
+          "fpr": 0.1111111111111111
+        },
+        "internal": {
+          "tpr": 1.0,
+          "fpr": 0.2
+        }
+      }
+    }
+  },
+  "rules_seed0": {
+    "none": [],
+    "snippet": [],
+    "verified_regex": [],
+    "text/narrow/flat": [
+      "addresses_agent+directive_modal",
+      "foreign_target+next_step"
+    ],
+    "text/narrow/curr": [
+      "addresses_agent+data_object",
+      "foreign_target+next_step"
+    ],
+    "text/broad/flat": [
+      "addresses_agent+directive_modal+effect_verb"
+    ],
+    "text/broad/curr": [
+      "addresses_agent+directive_modal+effect_verb"
+    ],
+    "slot/broad/flat": [
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ],
+    "slot/broad/curr": [
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ],
+    "both/broad/flat": [
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ],
+    "both/broad/curr": [
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ],
+    "both/broad/curr-noprune": [
+      "addresses_agent+directive_modal+effect_verb",
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ],
+    "both/broad/reverse": [
+      "slot:http_fetch.url",
+      "slot:send_email.to",
+      "slot:write_file.path"
+    ]
+  }
+}

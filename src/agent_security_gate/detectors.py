@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Any, Iterable
 from urllib.parse import urlparse
@@ -68,9 +69,11 @@ def _host_from_url_or_host(value: str) -> str | None:
     v = value.strip()
     if not v:
         return None
+    if "<" in v and ">" in v:  # display-name form: "Alice" <alice@example.com>
+        v = v[v.rindex("<") + 1 : v.rindex(">")].strip()
     if "://" in v:
         return (urlparse(v).hostname or "").lower() or None
-    return v.split("/")[0].split(":")[0].lower() or None
+    return v.split("/")[0].rsplit("@", 1)[-1].split(":")[0].lower() or None
 
 
 def check_network(tool: str, args: dict[str, Any], net: NetworkPolicy) -> list[Finding]:
@@ -156,21 +159,51 @@ def check_network(tool: str, args: dict[str, Any], net: NetworkPolicy) -> list[F
     return out
 
 
+_CONFUSABLES = str.maketrans("іарсеоѕјԁһ", "iapceosjdh")  # Cyrillic lookalikes -> latin
+_ZERO_WIDTH = re.compile("[\u200b-\u200f\u2060\ufeff]")
+_B64_TOKEN = re.compile(r"[A-Za-z0-9+/]{16,}={0,2}")
+
+
+def _views(payload: str) -> list[str]:
+    """Original + canonicalized (NFKC, homoglyph, zero-width) + base64-decoded views."""
+    canon = _ZERO_WIDTH.sub("", unicodedata.normalize("NFKC", payload)).translate(_CONFUSABLES)
+    views = [payload, canon]
+    for tok in _B64_TOKEN.findall(canon):
+        try:
+            dec = base64.b64decode(tok + "=" * (-len(tok) % 4), validate=True).decode("utf-8")
+        except ValueError:
+            continue
+        if dec.isprintable():
+            views.append(dec)
+    return list(dict.fromkeys(views))
+
+
 def check_prompt_injection(
     payload: str,
     trust: TrustLevel,
     content: ContentPolicy,
+    task: str = "",
 ) -> list[Finding]:
     if trust != TrustLevel.EXTERNAL or not payload:
         return []
     out: list[Finding] = []
+    if content.learned_rules and content.treat_external_as_data_only and content.block_instruction_patterns_in_data:
+        from .features import extract, fires  # lazy: features -> session -> detectors
+
+        views = _views(payload)  # [payload, canonical, ...]; deduped, so canonical may be absent
+        segs = extract(views[min(1, len(views) - 1)], task)
+        for rule in content.learned_rules:
+            if fires(segs, rule):
+                out.append(Finding("prompt_injection", "block", "learned feature rule in external data", "+".join(rule)))
+                break
     if content.treat_external_as_data_only and content.block_instruction_patterns_in_data:
         patterns: Iterable[re.Pattern[str] | str] = list(_INJECTION_PATTERNS) + list(
             content.extra_injection_patterns
         )
+        views = _views(payload)
         for p in patterns:
             if isinstance(p, str):
-                if re.search(p, payload, re.I):
+                if any(re.search(p, v, re.I) for v in views):
                     out.append(
                         Finding(
                             "prompt_injection",
@@ -179,7 +212,7 @@ def check_prompt_injection(
                             p[:80],
                         )
                     )
-            elif p.search(payload):
+            elif any(p.search(v) for v in views):
                 out.append(
                     Finding(
                         "prompt_injection",
@@ -375,3 +408,21 @@ def check_tcb_invariants(
             )
 
     return out
+
+
+def check_grounding(tool: str, args: dict[str, Any], task: str, ctx: str | None, trust: TrustLevel, content: ContentPolicy,
+                    net: NetworkPolicy | None = None) -> list[Finding]:
+    """Learned slots: an effect argument built from untrusted context must be grounded in the user task."""
+    if trust != TrustLevel.EXTERNAL or not ctx or not content.grounded_slots:
+        return []
+    from .features import ungrounded  # lazy: features -> session -> detectors
+
+    if content.free_plain_reads and net is not None and tool == "http_fetch" and isinstance(args.get("url"), str):
+        u = urlparse(args["url"])
+        if u.hostname in net.allowed_hosts and not (u.query or u.fragment or u.username):
+            return []
+
+    for t, a in content.grounded_slots:
+        if t == tool and isinstance(args.get(a), str) and (bad := ungrounded(args[a], task, ctx, tool)):
+            return [Finding("ungrounded_arg", "block", f"{tool}.{a} names a target the user task did not authorize", sorted(bad)[0][:60])]
+    return []

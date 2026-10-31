@@ -8,6 +8,7 @@ from typing import Any
 
 from .detectors import (
     Finding,
+    check_grounding,
     check_network,
     check_prompt_injection,
     check_secret_in_args,
@@ -16,6 +17,7 @@ from .detectors import (
 )
 from .policy import SecurityPolicy, TrustLevel
 from .roles import TaskIdentity, tool_allowed
+from .session import SessionState, risk_tier, session_findings
 
 
 @dataclass(frozen=True)
@@ -33,6 +35,14 @@ class Decision:
     findings: tuple[Finding, ...]
     latency_ms: float
     reason: str
+    tier: str = "high"
+    deep_scan: bool = True  # False = injection scan deferred (adaptive mode, low-risk call)
+
+    @property
+    def needs_approval(self) -> bool:
+        """Denied only because a target is not grounded in the user task: a human can resolve it (ask tier)."""
+        blocks = {f.detector for f in self.findings if f.severity == "block"}
+        return (not self.allowed) and blocks == {"ungrounded_arg"}
 
 
 @dataclass
@@ -53,11 +63,30 @@ class ReferenceMonitor:
         self.audit: list[AuditEntry] = []
         self.calls_seen = 0
         self.calls_bypassed = 0  # should stay 0 if runtime is correct
+        self.deep_scans = 0
+        self.deep_scans_deferred = 0
 
-    def check(self, identity: TaskIdentity, req: ToolRequest) -> Decision:
+    def check(
+        self,
+        identity: TaskIdentity,
+        req: ToolRequest,
+        session: SessionState | None = None,
+        adaptive: bool = False,
+    ) -> Decision:
+        """Stateless when session is None. With a session: provenance is tracked here
+        (not by the caller), and adaptive=True defers the injection scan on low-risk calls
+        to the next effect boundary (the ingested text stays in the session)."""
         t0 = time.perf_counter()
         self.calls_seen += 1
         findings: list[Finding] = []
+        tier, ctx, trust = "high", req.data_channel, req.data_trust
+        if session is not None:
+            tier = "high" if session.suspicious else risk_tier(req.tool, self.policy)
+            if req.data_channel and req.data_trust == TrustLevel.EXTERNAL:
+                session.ingest("caller", req.data_channel)
+            elif not req.data_channel and session.ambient:
+                ctx, trust = session.ambient_text(), TrustLevel.EXTERNAL
+        deep = not (adaptive and tier == "low")
 
         if not tool_allowed(identity, req.tool, self.policy):
             findings.append(
@@ -75,18 +104,24 @@ class ReferenceMonitor:
             check_tcb_invariants(
                 req.tool,
                 req.args,
-                req.data_channel,
-                req.data_trust,
+                ctx,
+                trust,
                 self.policy.content,
             )
         )
 
-        if req.data_channel:
-            findings.extend(
-                check_prompt_injection(
-                    req.data_channel, req.data_trust, self.policy.content
-                )
-            )
+        findings.extend(check_grounding(req.tool, req.args, identity.task, ctx, trust, self.policy.content, self.policy.network))
+        if ctx and deep:
+            self.deep_scans += 1
+            inj = check_prompt_injection(ctx, trust, self.policy.content, identity.task)
+            findings.extend(inj)
+            if inj and session is not None:
+                session.suspicious = True
+        elif ctx:
+            self.deep_scans_deferred += 1
+        if session is not None:
+            findings.extend(session_findings(session, req.tool, req.args, self.policy))
+            session.history.append((req.tool, tier))
 
         blocks = [f for f in findings if f.severity == "block"]
         allowed = len(blocks) == 0
@@ -97,6 +132,8 @@ class ReferenceMonitor:
             findings=tuple(findings),
             latency_ms=latency_ms,
             reason=reason,
+            tier=tier,
+            deep_scan=deep,
         )
         self.audit.append(
             AuditEntry(

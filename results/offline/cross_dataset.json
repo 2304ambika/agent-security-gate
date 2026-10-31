@@ -1,0 +1,513 @@
+{
+  "train_datasets_to_benchmarks": {
+    "train": [
+      "internal",
+      "hendar",
+      "coding_agent"
+    ],
+    "train_fns": 80,
+    "verified_updater": {
+      "proposed": 123,
+      "accepted": 93,
+      "rejected_regression": 30,
+      "unlearnable_fn": 45,
+      "expansion_requests": 0
+    },
+    "test": {
+      "lakera_l2": {
+        "none": {
+          "attacks": 210,
+          "tpr": 0.004761904761904762,
+          "tpr_ci": [
+            0.001,
+            0.026
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "snippet": {
+          "attacks": 210,
+          "tpr": 0.004761904761904762,
+          "tpr_ci": [
+            0.001,
+            0.026
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "verified": {
+          "attacks": 210,
+          "tpr": 0.004761904761904762,
+          "tpr_ci": [
+            0.001,
+            0.026
+          ],
+          "benign": 0,
+          "fpr": null
+        }
+      },
+      "injecagent_hard": {
+        "none": {
+          "attacks": 600,
+          "tpr": 1.0,
+          "tpr_ci": [
+            0.994,
+            1.0
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "snippet": {
+          "attacks": 600,
+          "tpr": 1.0,
+          "tpr_ci": [
+            0.994,
+            1.0
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "verified": {
+          "attacks": 600,
+          "tpr": 1.0,
+          "tpr_ci": [
+            0.994,
+            1.0
+          ],
+          "benign": 0,
+          "fpr": null
+        }
+      },
+      "a3s_hard": {
+        "none": {
+          "attacks": 400,
+          "tpr": 0.5,
+          "tpr_ci": [
+            0.451,
+            0.549
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "snippet": {
+          "attacks": 400,
+          "tpr": 0.5,
+          "tpr_ci": [
+            0.451,
+            0.549
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "verified": {
+          "attacks": 400,
+          "tpr": 0.5075,
+          "tpr_ci": [
+            0.459,
+            0.556
+          ],
+          "benign": 0,
+          "fpr": null
+        }
+      },
+      "agentharm_toolish": {
+        "none": {
+          "attacks": 192,
+          "tpr": 0.9791666666666666,
+          "tpr_ci": [
+            0.948,
+            0.992
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "snippet": {
+          "attacks": 192,
+          "tpr": 0.9791666666666666,
+          "tpr_ci": [
+            0.948,
+            0.992
+          ],
+          "benign": 0,
+          "fpr": null
+        },
+        "verified": {
+          "attacks": 192,
+          "tpr": 0.9791666666666666,
+          "tpr_ci": [
+            0.948,
+            0.992
+          ],
+          "benign": 0,
+          "fpr": null
+        }
+      }
+    }
+  },
+  "leave_one_suite_out": {
+    "internal": {
+      "train": [
+        "hendar",
+        "lakera_l2",
+        "injecagent_hard",
+        "a3s_hard",
+        "agentharm_toolish",
+        "coding_agent"
+      ],
+      "train_fns": 490,
+      "verified_updater": {
+        "proposed": 489,
+        "accepted": 452,
+        "rejected_regression": 37,
+        "unlearnable_fn": 197,
+        "expansion_requests": 0
+      },
+      "test": {
+        "internal": {
+          "none": {
+            "attacks": 53,
+            "tpr": 0.9433962264150944,
+            "tpr_ci": [
+              0.846,
+              0.981
+            ],
+            "benign": 20,
+            "fpr": 0.05
+          },
+          "snippet": {
+            "attacks": 53,
+            "tpr": 0.9433962264150944,
+            "tpr_ci": [
+              0.846,
+              0.981
+            ],
+            "benign": 20,
+            "fpr": 0.05
+          },
+          "verified": {
+            "attacks": 53,
+            "tpr": 0.9622641509433962,
+            "tpr_ci": [
+              0.872,
+              0.99
+            ],
+            "benign": 20,
+            "fpr": 0.05
+          }
+        }
+      }
+    },
+    "hendar": {
+      "train": [
+        "internal",
+        "lakera_l2",
+        "injecagent_hard",
+        "a3s_hard",
+        "agentharm_toolish",
+        "coding_agent"
+      ],
+      "train_fns": 484,
+      "verified_updater": {
+        "proposed": 489,
+        "accepted": 450,
+        "rejected_regression": 39,
+        "unlearnable_fn": 190,
+        "expansion_requests": 0
+      },
+      "test": {
+        "hendar": {
+          "none": {
+            "attacks": 13,
+            "tpr": 0.3076923076923077,
+            "tpr_ci": [
+              0.127,
+              0.576
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "snippet": {
+            "attacks": 13,
+            "tpr": 0.3076923076923077,
+            "tpr_ci": [
+              0.127,
+              0.576
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "verified": {
+            "attacks": 13,
+            "tpr": 0.3076923076923077,
+            "tpr_ci": [
+              0.127,
+              0.576
+            ],
+            "benign": 0,
+            "fpr": null
+          }
+        }
+      }
+    },
+    "lakera_l2": {
+      "train": [
+        "internal",
+        "hendar",
+        "injecagent_hard",
+        "a3s_hard",
+        "agentharm_toolish",
+        "coding_agent"
+      ],
+      "train_fns": 284,
+      "verified_updater": {
+        "proposed": 385,
+        "accepted": 346,
+        "rejected_regression": 39,
+        "unlearnable_fn": 123,
+        "expansion_requests": 0
+      },
+      "test": {
+        "lakera_l2": {
+          "none": {
+            "attacks": 210,
+            "tpr": 0.004761904761904762,
+            "tpr_ci": [
+              0.001,
+              0.026
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "snippet": {
+            "attacks": 210,
+            "tpr": 0.08571428571428572,
+            "tpr_ci": [
+              0.055,
+              0.131
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "verified": {
+            "attacks": 210,
+            "tpr": 0.04285714285714286,
+            "tpr_ci": [
+              0.023,
+              0.079
+            ],
+            "benign": 0,
+            "fpr": null
+          }
+        }
+      }
+    },
+    "injecagent_hard": {
+      "train": [
+        "internal",
+        "hendar",
+        "lakera_l2",
+        "a3s_hard",
+        "agentharm_toolish",
+        "coding_agent"
+      ],
+      "train_fns": 493,
+      "verified_updater": {
+        "proposed": 490,
+        "accepted": 451,
+        "rejected_regression": 39,
+        "unlearnable_fn": 198,
+        "expansion_requests": 0
+      },
+      "test": {
+        "injecagent_hard": {
+          "none": {
+            "attacks": 600,
+            "tpr": 1.0,
+            "tpr_ci": [
+              0.994,
+              1.0
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "snippet": {
+            "attacks": 600,
+            "tpr": 1.0,
+            "tpr_ci": [
+              0.994,
+              1.0
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "verified": {
+            "attacks": 600,
+            "tpr": 1.0,
+            "tpr_ci": [
+              0.994,
+              1.0
+            ],
+            "benign": 0,
+            "fpr": null
+          }
+        }
+      }
+    },
+    "a3s_hard": {
+      "train": [
+        "internal",
+        "hendar",
+        "lakera_l2",
+        "injecagent_hard",
+        "agentharm_toolish",
+        "coding_agent"
+      ],
+      "train_fns": 293,
+      "verified_updater": {
+        "proposed": 230,
+        "accepted": 200,
+        "rejected_regression": 30,
+        "unlearnable_fn": 124,
+        "expansion_requests": 0
+      },
+      "test": {
+        "a3s_hard": {
+          "none": {
+            "attacks": 400,
+            "tpr": 0.5,
+            "tpr_ci": [
+              0.451,
+              0.549
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "snippet": {
+            "attacks": 400,
+            "tpr": 0.525,
+            "tpr_ci": [
+              0.476,
+              0.573
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "verified": {
+            "attacks": 400,
+            "tpr": 0.6125,
+            "tpr_ci": [
+              0.564,
+              0.659
+            ],
+            "benign": 0,
+            "fpr": null
+          }
+        }
+      }
+    },
+    "agentharm_toolish": {
+      "train": [
+        "internal",
+        "hendar",
+        "lakera_l2",
+        "injecagent_hard",
+        "a3s_hard",
+        "coding_agent"
+      ],
+      "train_fns": 489,
+      "verified_updater": {
+        "proposed": 489,
+        "accepted": 450,
+        "rejected_regression": 39,
+        "unlearnable_fn": 195,
+        "expansion_requests": 0
+      },
+      "test": {
+        "agentharm_toolish": {
+          "none": {
+            "attacks": 192,
+            "tpr": 0.9791666666666666,
+            "tpr_ci": [
+              0.948,
+              0.992
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "snippet": {
+            "attacks": 192,
+            "tpr": 0.9791666666666666,
+            "tpr_ci": [
+              0.948,
+              0.992
+            ],
+            "benign": 0,
+            "fpr": null
+          },
+          "verified": {
+            "attacks": 192,
+            "tpr": 0.9791666666666666,
+            "tpr_ci": [
+              0.948,
+              0.992
+            ],
+            "benign": 0,
+            "fpr": null
+          }
+        }
+      }
+    },
+    "coding_agent": {
+      "train": [
+        "internal",
+        "hendar",
+        "lakera_l2",
+        "injecagent_hard",
+        "a3s_hard",
+        "agentharm_toolish"
+      ],
+      "train_fns": 425,
+      "verified_updater": {
+        "proposed": 381,
+        "accepted": 380,
+        "rejected_regression": 1,
+        "unlearnable_fn": 145,
+        "expansion_requests": 0
+      },
+      "test": {
+        "coding_agent": {
+          "none": {
+            "attacks": 101,
+            "tpr": 0.32673267326732675,
+            "tpr_ci": [
+              0.243,
+              0.423
+            ],
+            "benign": 99,
+            "fpr": 0.10101010101010101
+          },
+          "snippet": {
+            "attacks": 101,
+            "tpr": 0.32673267326732675,
+            "tpr_ci": [
+              0.243,
+              0.423
+            ],
+            "benign": 99,
+            "fpr": 0.12121212121212122
+          },
+          "verified": {
+            "attacks": 101,
+            "tpr": 0.42574257425742573,
+            "tpr_ci": [
+              0.334,
+              0.523
+            ],
+            "benign": 99,
+            "fpr": 0.30303030303030304
+          }
+        }
+      }
+    }
+  }
+}

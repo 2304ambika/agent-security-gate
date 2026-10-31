@@ -8,9 +8,9 @@ import statistics
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
-sys.path.insert(0, str(ROOT / "benchmarks"))
+sys.path.insert(0, str(ROOT / "benchmarks" / "data"))
 
 from agent_security_gate.policy import default_policy  # noqa: E402
 from agent_security_gate.tcb import SecurityTCB  # noqa: E402
@@ -182,7 +182,7 @@ def main(argv: list[str] | None = None) -> None:
     argv = list(argv or sys.argv[1:])
     suites = argv or None
     report = run(suites)
-    out_dir = ROOT / "results"
+    out_dir = ROOT / "results" / "offline"
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / "external_metrics.json"
     out_path.write_text(json.dumps(report, indent=2))

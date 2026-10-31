@@ -85,11 +85,15 @@ def load_internal() -> list[Scenario]:
     return list(SCENARIOS)
 
 
-def load_hendar(*, hard_only: bool = True) -> list[Scenario]:
+def load_hendar(*, hard_only: bool = True, pi_only: bool = True) -> list[Scenario]:
     """Hendar academy benchmark — security-relevant configs.
 
     Not a conference SOTA ranking set; useful as a compact CI/governance
     regression suite. See dataset card: h0000w/hendar-agentic-ai-dataset.
+
+    pi_only (default): keep only the prompt_injection config. The other configs pick the
+    tool *from the label* (deny -> shell_exec/send_email, allow -> http_fetch), so the gate's
+    RBAC would "predict" the label by construction; they are label-leaky and excluded.
     """
     out: list[Scenario] = []
     configs = (
@@ -99,6 +103,8 @@ def load_hendar(*, hard_only: bool = True) -> list[Scenario]:
         "multi_agent_tasks",
     )
     for cfg in configs:
+        if pi_only and cfg != "prompt_injection":
+            continue
         for row in _load_jsonl(EXT / "hendar" / f"{cfg}.jsonl"):
             risk = (row.get("risk_level") or "low").lower()
             if hard_only and risk not in {"high", "critical"} and cfg != "prompt_injection":
@@ -160,6 +166,8 @@ def load_hendar(*, hard_only: bool = True) -> list[Scenario]:
 
             out.append(
                 Scenario(
+                    case_id="EXT",
+                    difficulty="hard",
                     id=f"hendar_{row['id']}",
                     task=row.get("input") or cfg,
                     role=role,
@@ -189,6 +197,8 @@ def load_lakera_l2() -> list[Scenario]:
         )
         out.append(
             Scenario(
+                case_id="EXT",
+                difficulty="hard",
                 id=f"lakera_l2_{i}",
                 task=f"Agent task in app {row.get('app_name')}",
                 role="researcher",
@@ -228,6 +238,8 @@ def load_injecagent_hard() -> list[Scenario]:
         )
         out.append(
             Scenario(
+                case_id="EXT",
+                difficulty="hard",
                 id=row["id"],
                 task=row.get("user_instruction") or "user tool task",
                 role="researcher",
@@ -290,6 +302,8 @@ def load_a3s_hard() -> list[Scenario]:
             )
         out.append(
             Scenario(
+                case_id="EXT",
+                difficulty="hard",
                 id=f"a3s_{row.get('id')}",
                 task=row.get("description") or row.get("name") or "a3s",
                 role="researcher",
@@ -318,6 +332,8 @@ def load_agentharm_toolish() -> list[Scenario]:
         )
         out.append(
             Scenario(
+                case_id="EXT",
+                difficulty="hard",
                 id=f"agentharm_{row.get('id')}",
                 task=row.get("name") or "harmful agent task",
                 role="researcher",  # least privilege: no harmful tools
@@ -354,18 +370,18 @@ def load_coding_agent() -> list[Scenario]:
             tool, args = "read_file", {"path": "notes/session.md"}
         out.append(
             Scenario(
+                case_id="EXT",
+                difficulty="hard",
                 id=f"coding_{i}",
                 task="coding agent session message",
-                role="coder" if not expect_block else "researcher",
+                role="coder" if tool == "shell_exec" else "researcher",  # by tool, never by label
                 principal="coding",
                 steps=(
                     Step(
                         tool,
                         args,
-                        data_channel=raw[:2000] if expect_block else None,
-                        data_trust=(
-                            TrustLevel.EXTERNAL if expect_block else TrustLevel.USER
-                        ),
+                        data_channel=raw[:2000],  # label-neutral: every row is untrusted content
+                        data_trust=TrustLevel.EXTERNAL,
                         expect_block=expect_block,
                         label=label,
                     ),

@@ -6,3 +6,5 @@ fujitsu/
 coding_agent/test.parquet
 coding_agent/rows_*.json
 **/__pycache__/
+tamas/
+aciarena/
